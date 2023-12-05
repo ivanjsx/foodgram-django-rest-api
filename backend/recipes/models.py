@@ -69,8 +69,8 @@ class Ingredient(WithTimestamps, WithTitle):
         default_related_name = "ingredients"
         constraints = (
             UniqueConstraint(
-                fields=("title", ),
-                name="ingredient title must be unique"
+                fields=("title", "measurement_unit"),
+                name="title & measurement_unit must make a unique pair"
             ),
         )
 
