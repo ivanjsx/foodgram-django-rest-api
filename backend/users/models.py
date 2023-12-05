@@ -8,7 +8,7 @@ from core.models import WithTimestamps
 User = get_user_model()
 
 
-class Follow(WithTimestamps):
+class Subscription(WithTimestamps):
     """
     Subscription of a user to another user on the platform.
     """

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Favorite, Ingredient, Recipe, RecipeIngredient, Tag
+from .models import Favorite, Ingredient, Recipe, Quantity, Tag
 
 
 class EmptyValueDisplay(admin.ModelAdmin):
@@ -52,6 +52,6 @@ class RecipeAdmin(EmptyValueDisplay):
         )
 
 
-@admin.register(RecipeIngredient)
-class RecipeIngredientAdmin(EmptyValueDisplay):
+@admin.register(Quantity)
+class QuantityAdmin(EmptyValueDisplay):
     list_display = ("id", "recipe", "ingredient", "quantity")

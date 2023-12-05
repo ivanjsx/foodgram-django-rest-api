@@ -100,7 +100,7 @@ class Recipe(WithTimestamps, WithTitle):
     )
     ingredients = ManyToManyField(
         to=Ingredient,
-        through="RecipeIngredient",
+        through="Quantity",
         verbose_name="Set of ingredients",
         help_text="Provide a set of ingredients it includes",
     )
@@ -146,7 +146,7 @@ class RecipeTag(WithTimestamps):
         return f"{self.recipe} is tagged with {self.tag}"
 
 
-class RecipeIngredient(WithTimestamps):
+class Quantity(WithTimestamps):
     """
     Implements Many-to-Many Relationship between a recipe and an ingredient.
     Defined explicitly to indicate additional data (like quantity).
@@ -168,6 +168,7 @@ class RecipeIngredient(WithTimestamps):
     )
 
     class Meta:
+        verbose_name_plural = "Quantities"
         constraints = (
             UniqueConstraint(
                 fields=("recipe", "ingredient"),
