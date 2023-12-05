@@ -13,18 +13,18 @@ User = get_user_model()
 
 
 class WithTitle(Model):
-    title = CharField(
+    name = CharField(
         max_length=MAX_TITLE_LENGTH,
-        verbose_name="title",
-        help_text="Provide a title",
+        verbose_name="name",
+        help_text="Provide a name",
     )
 
     class Meta:
         abstract = True
-        ordering = ("title", )
+        ordering = ("name", )
 
     def __str__(self):
-        return self.title
+        return self.name
 
 
 class Tag(WithTimestamps, WithTitle):
@@ -48,8 +48,8 @@ class Tag(WithTimestamps, WithTitle):
         default_related_name = "tags"
         constraints = (
             UniqueConstraint(
-                fields=("title", ),
-                name="tag title must be unique"
+                fields=("name", ),
+                name="tag name must be unique"
             ),
         )
 
@@ -69,8 +69,8 @@ class Ingredient(WithTimestamps, WithTitle):
         default_related_name = "ingredients"
         constraints = (
             UniqueConstraint(
-                fields=("title", "measurement_unit"),
-                name="title & measurement_unit must make a unique pair"
+                fields=("name", "measurement_unit"),
+                name="name & measurement_unit must make a unique pair"
             ),
         )
 

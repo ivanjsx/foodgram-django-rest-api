@@ -9,14 +9,14 @@ class EmptyValueDisplay(admin.ModelAdmin):
 
 @admin.register(Tag)
 class TagAdmin(EmptyValueDisplay):
-    list_display = ("id", "title", "slug", "hex_color")
-    search_fields = ("title", )
+    list_display = ("id", "name", "slug", "hex_color")
+    search_fields = ("name", )
 
 
 @admin.register(Ingredient)
 class IngredientAdmin(EmptyValueDisplay):
-    list_display = ("id", "title", "measurement_unit")
-    search_fields = ("title", )
+    list_display = ("id", "name", "measurement_unit")
+    search_fields = ("name", )
 
 
 @admin.register(Favorite)
@@ -27,19 +27,19 @@ class FavoriteAdmin(EmptyValueDisplay):
 @admin.register(Recipe)
 class RecipeAdmin(EmptyValueDisplay):
     list_display = (
-        "id", "title", "description", "cooking_time", "author", "cover_image",
+        "id", "name", "description", "cooking_time", "author", "cover_image",
         "tags", "ingredients"
     )
     list_filter = ("tags", "ingredients")
     list_editable = ("tags", )
-    search_fields = ("title", )
+    search_fields = ("name", )
 
     @admin.display(
         description='tags',
     )
     def tags(self, obj):
         return ', '.join(
-            [tag.title for tag in obj.tags.all()]
+            [tag.name for tag in obj.tags.all()]
         )
 
     @admin.display(
@@ -48,7 +48,7 @@ class RecipeAdmin(EmptyValueDisplay):
     def ingredients(self, obj):
         return ', '.join(
             # TODO indicate quantities as well
-            [ingredient.title for ingredient in obj.ingredients.all()]
+            [ingredient.name for ingredient in obj.ingredients.all()]
         )
 
 

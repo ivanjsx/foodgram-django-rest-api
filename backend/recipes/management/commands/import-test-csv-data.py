@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Model
 
-from ...models import Ingredient
+from ...models import Ingredient, Recipe
 
 User = get_user_model()
 
@@ -35,9 +35,9 @@ class Command(BaseCommand):
         )[0]
 
     def handle_fields(self, fields, model: Type[Model]):
-        if model == Ingredient:
-            self.replace_field_name(fields, "name", "title")
-            # might as well set_instance_from_id() right here
+        if model == Recipe:
+            self.replace_field_name(fields, "title", "name")
+            self.set_instance_from_id(fields, "author", User)
 
     def parse_table(self, table_path, model: Type[Model]):
         with open(file=table_path, mode="r", encoding="utf-8") as table:
