@@ -1,26 +1,15 @@
 from colorfield.fields import ColorField
 from django.contrib.auth import get_user_model
 from django.db.models import (
-    CASCADE, CharField, DateTimeField, FloatField, ForeignKey, ImageField,
-    ManyToManyField, Model, PositiveSmallIntegerField, SlugField, TextField,
-    UniqueConstraint,
+    CASCADE, CharField, FloatField, ForeignKey, ImageField, ManyToManyField,
+    Model, PositiveSmallIntegerField, SlugField, TextField, UniqueConstraint,
 )
+
+from core.models import WithTimestamps
 
 from .constants import MAX_TITLE_LENGTH
 
 User = get_user_model()
-
-
-class WithTimestamps(Model):
-    created = DateTimeField(
-        db_index=True,
-        auto_now_add=True,
-        verbose_name="date & time of instance creation",
-    )
-    modified = DateTimeField(
-        auto_now=True,
-        verbose_name="date & time of last instance modification",
-    )
 
 
 class WithTitle(Model):
@@ -123,6 +112,7 @@ class Recipe(WithTimestamps, WithTitle):
 
     class Meta(WithTitle.Meta):
         default_related_name = "recipes"
+        ordering = ("-created", )
 
 
 class RecipeTag(WithTimestamps):

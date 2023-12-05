@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "colorfield",
     "api.apps.ApiConfig",
+    "core.apps.CoreConfig",
     "users.apps.UsersConfig",
     "recipes.apps.RecipesConfig",
 ]
