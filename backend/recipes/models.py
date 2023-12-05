@@ -7,7 +7,7 @@ from django.db.models import (
 
 from core.models import WithTimestamps
 
-from .constants import MAX_TITLE_LENGTH
+from .constants import MAX_TITLE_LENGTH, MAX_UNIT_LENGTH
 
 User = get_user_model()
 
@@ -27,18 +27,7 @@ class WithTitle(Model):
         return self.title
 
 
-class WithUniqueTitle(WithTitle):
-
-    class Meta(WithTitle.Meta):
-        constraints = (
-            UniqueConstraint(
-                fields=("title", ),
-                name="title must be unique"
-            ),
-        )
-
-
-class Tag(WithTimestamps, WithUniqueTitle):
+class Tag(WithTimestamps, WithTitle):
     """
     A tag, which the recipe may or may not be tagged with.
     """
@@ -55,22 +44,35 @@ class Tag(WithTimestamps, WithUniqueTitle):
         help_text="Provide a unique color",
     )
 
-    class Meta(WithUniqueTitle.Meta):
+    class Meta(WithTitle.Meta):
         default_related_name = "tags"
+        constraints = (
+            UniqueConstraint(
+                fields=("title", ),
+                name="tag title must be unique"
+            ),
+        )
 
 
-class Ingredient(WithTimestamps, WithUniqueTitle):
+class Ingredient(WithTimestamps, WithTitle):
     """
     An ingredient, which the recipe includes.
     """
 
     measurement_unit = CharField(
+        max_length=MAX_UNIT_LENGTH,
         verbose_name="measurement unit",
         help_text="Provide a measurement unit",
     )
 
-    class Meta(WithUniqueTitle.Meta):
+    class Meta(WithTitle.Meta):
         default_related_name = "ingredients"
+        constraints = (
+            UniqueConstraint(
+                fields=("title", ),
+                name="ingredient title must be unique"
+            ),
+        )
 
 
 class Recipe(WithTimestamps, WithTitle):
