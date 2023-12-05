@@ -44,4 +44,5 @@ social-auth-app-django==5.4.0
 social-auth-core==4.5.1
 sqlparse==0.4.4
 toml==0.10.2
+typing_extensions==4.8.0
 urllib3==1.26.16

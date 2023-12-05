@@ -6,6 +6,9 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path(
         route="api/",
-        view=include(arg="api.urls"),
+        view=include(
+            arg="api.urls",
+            namespace="api"
+        ),
     ),
 ]
