@@ -23,8 +23,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.staticfiles",
     "django.contrib.contenttypes",
-    "colorfield",
+
+    "djoser",
+    "django_filters",
     "rest_framework",
+    "rest_framework.authtoken",
+
     "api.apps.ApiConfig",
     "core.apps.CoreConfig",
     "users.apps.UsersConfig",
@@ -117,10 +121,27 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
+# Custom Authentication
+
+AUTH_USER_MODEL = "users.CustomUser"
+
+DJOSER = {
+    "LOGIN_FIELD": "email",
+    "LOGOUT_ON_PASSWORD_CHANGE": True,
+}
+
+
 # Django REST Framework
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly",
+    ],
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend"
+    ],
+    "EXCEPTION_HANDLER": "api.utils.custom_exception_handler"
 }
