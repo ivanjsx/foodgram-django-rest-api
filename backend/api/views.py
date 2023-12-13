@@ -76,3 +76,15 @@ class UserViewSet(GenericViewSet, ListCreateRetrieveMixin):
     def set_own_password(self, request):
         return set_new_password(request.user, request.data)
 
+    @action(detail=True,
+            methods=(HTTPMethod.POST, ),
+            url_path="set_password",
+            permission_classes=(SetOnesPasswordActionPermission, ))
+    def set_ones_password(self, request, pk=None):
+        serializer = QueryParamsSerializer(data={"pk": pk})
+        serializer.is_valid(raise_exception=True)
+        return set_new_password(
+            get_object_or_404(User, id=serializer.validated_data["pk"]),
+            request.data
+        )
+

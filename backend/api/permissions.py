@@ -20,6 +20,16 @@ class UserViewSetPermission(AllowAny):
         )
 
 
+class SetOnesPasswordActionPermission(BasePermission):
+    """
+    Safe methods are disabled at the action level.
+    To change any user's password,
+    authentication as the django administrator is required.
+    """
+
+    def has_permission(self, request, view):
+        return request.user and request.user.is_staff
+
 
 class IsAdminOrReadOnly(BasePermission):
     """
