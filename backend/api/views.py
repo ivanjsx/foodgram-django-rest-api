@@ -89,6 +89,23 @@ class UserViewSet(GenericViewSet, ListCreateRetrieveMixin):
         )
 
 
+    @action(detail=False,
+            methods=(HTTPMethod.GET, ),
+            permission_classes=(IsAuthenticated, ))
+    def subscriptions(self, request):
+        queryset = self.get_queryset().filter(followers__follower=request.user)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = ExtendedUserShowSerializer(
+                instance=page, many=True, context={"request": request}
+            )
+            return self.get_paginated_response(serializer.data)
+        serializer = ExtendedUserShowSerializer(
+            instance=queryset, many=True, context={"request": request}
+        )
+        return Response(data=serializer.data, status=HTTP_200_OK)
+
+
 class RecipeViewSet(ModelViewSet, PartialUpdateOnlyMixin):
 
     serializer_class = DefaultRecipeSerializer
