@@ -1,15 +1,47 @@
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from http import HTTPMethod
 
-from recipes.models import Ingredient, Tag
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
+from django.shortcuts import get_object_or_404
 
-from .serializers import IngredientSerializer, TagSerializer
+from rest_framework.decorators import action
+from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.status import HTTP_200_OK
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
+
+from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag
+
+from .filters import (FilterIngredientsByName, FilterRecipesByTagsAndAuthor,
+                      filter_recipes_by_query_params)
+from .helpers import (add_recipe_to_user_list, create_csv_response,
+                      create_txt_response, reduce_cart,
+                      remove_recipe_from_user_list, set_new_password,
+                      subscribe_to, unsubscribe_from)
+from .mixins import ListCreateRetrieveMixin, PartialUpdateOnlyMixin
+from .paginators import CustomPageSizePagination
+from .permissions import (IsAdminOrReadOnly, RecipeViewSetPermission,
+                          SetOnesPasswordActionPermission,
+                          UserViewSetPermission)
+from .serializers import (DefaultRecipeSerializer, ExtendedUserShowSerializer,
+                          IngredientSerializer, QueryParamsSerializer,
+                          TagSerializer, UserCreateSerializer,
+                          UserShowSerializer)
+
+User = get_user_model()
 
 
-class TagViewSet(ReadOnlyModelViewSet):
+class TagViewSet(ModelViewSet):
+
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    permission_classes = (IsAdminOrReadOnly, )
 
 
-class IngredientViewSet(ReadOnlyModelViewSet):
+class IngredientViewSet(ModelViewSet):
+
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    permission_classes = (IsAdminOrReadOnly, )
+    filterset_class = FilterIngredientsByName
+
