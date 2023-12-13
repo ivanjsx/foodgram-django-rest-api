@@ -114,6 +114,17 @@ class AmountInputSerializer(Serializer):
         return value
 
 
+class AmountOutputSerializer(ModelSerializer):
+
+    id = IntegerField(source="ingredient.id")
+    name = CharField(source="ingredient.name")
+    measurement_unit = CharField(source="ingredient.measurement_unit")
+
+    class Meta:
+        model = Amount
+        fields = ("id", "name", "measurement_unit", "amount")
+
+
 class DefaultRecipeSerializer(ModelSerializer):
 
     author = UserShowSerializer(required=False)
@@ -154,6 +165,20 @@ class DefaultRecipeSerializer(ModelSerializer):
         if not user.is_authenticated:
             return False
         return user.cart.filter(recipe=obj).exists()
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        ingredients = AmountOutputSerializer(
+            instance=instance.ingredients.all(),
+            many=True
+        )
+        tags = TagSerializer(
+            instance=instance.tags.all(),
+            many=True
+        )
+        representation["ingredients"] = ingredients.data
+        representation["tags"] = tags.data
+        return representation
 
     def create(self, validated_data):
         tags = validated_data.pop("tags", [])
