@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db.models import (CASCADE, CharField, ForeignKey, ImageField,
-                              IntegerField, Model, PositiveSmallIntegerField,
-                              SlugField, TextField, UniqueConstraint)
+                              IntegerField, ManyToManyField, Model,
+                              PositiveSmallIntegerField, SlugField, TextField,
+                              UniqueConstraint)
 
 from core.models import WithTimestamps
 
@@ -81,6 +82,9 @@ class Ingredient(WithTimestamps, WithName):
             ),
         )
 
+    def __str__(self):
+        return f"{self.name}, {self.measurement_unit}"
+
 
 class Recipe(WithTimestamps, WithName):
     """
@@ -107,6 +111,12 @@ class Recipe(WithTimestamps, WithName):
         verbose_name="Cover image",
         help_text="Upload a cover image",
     )
+    tags = ManyToManyField(
+        to=Tag,
+        through="RecipeTag",
+        verbose_name="Set of tags",
+        help_text="Provide a set of tags it belongs to",
+    )
 
     class Meta:
         ordering = ("-created", )
@@ -125,7 +135,6 @@ class RecipeTag(WithTimestamps):
     recipe = ForeignKey(
         to=Recipe,
         on_delete=CASCADE,
-        related_name="tags",
     )
     tag = ForeignKey(
         to=Tag,
@@ -145,7 +154,7 @@ class RecipeTag(WithTimestamps):
         return f"{self.recipe} is tagged with {self.tag}"
 
 
-class Amount(WithTimestamps):
+class IngredientAmountInRecipe(WithTimestamps):
     """
     Implements Many-to-Many Relationship between a recipe and an ingredient.
     Defined explicitly to indicate additional data (for instance, amount).
@@ -154,7 +163,7 @@ class Amount(WithTimestamps):
     recipe = ForeignKey(
         to=Recipe,
         on_delete=CASCADE,
-        related_name="ingredients",
+        related_name="ingredients"
     )
     ingredient = ForeignKey(
         to=Ingredient,
@@ -176,7 +185,9 @@ class Amount(WithTimestamps):
         )
 
     def __str__(self):
-        return f"{self.recipe} includes {self.amount} of {self.ingredient}"
+        return (f"{self.recipe} includes {self.amount} "
+                f"{self.ingredient.measurement_unit} of "
+                f"{self.ingredient.name}")
 
 
 class FavoriteItem(WithTimestamps):

@@ -1,57 +1,63 @@
 from django.contrib import admin
 
-from .models import Favorite, Ingredient, Recipe, Quantity, Tag
+from .models import (CartItem, FavoriteItem, Ingredient,
+                     IngredientAmountInRecipe, Recipe, RecipeTag, Tag)
 
-
-class EmptyValueDisplay(admin.ModelAdmin):
-    empty_value_display = "-empty-"
+admin.site.empty_value_display = "-empty-"
 
 
 @admin.register(Tag)
-class TagAdmin(EmptyValueDisplay):
-    list_display = ("id", "name", "slug", "hex_color")
-    search_fields = ("name", )
+class TagAdmin(admin.ModelAdmin):
+    list_display = ("id", "name", "slug", "color")
+    search_fields = ("name", "slug")
+    list_filter = ("name", )
 
 
 @admin.register(Ingredient)
-class IngredientAdmin(EmptyValueDisplay):
+class IngredientAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "measurement_unit")
     search_fields = ("name", )
+    list_filter = ("name", )
 
 
-@admin.register(Favorite)
-class FavoriteAdmin(EmptyValueDisplay):
-    list_display = ("id", "user", "recipe")
+class RecipeTagInline(admin.TabularInline):
+    model = RecipeTag
+
+
+class AmountInline(admin.TabularInline):
+    model = IngredientAmountInRecipe
+
+
+@admin.display(description="tags")
+def tags(obj):
+    return ", ".join(
+        obj.tags.all().values_list("name", flat=True)
+    )
+
+
+@admin.display(description="ingredients")
+def ingredients(obj):
+    return ", ".join(
+        obj.ingredients.all().values_list("ingredient__name", flat=True)
+    )
 
 
 @admin.register(Recipe)
-class RecipeAdmin(EmptyValueDisplay):
+class RecipeAdmin(admin.ModelAdmin):
     list_display = (
-        "id", "name", "description", "cooking_time", "author", "cover_image",
-        "tags", "ingredients"
+        "id", "name", "text", "cooking_time", "author", "image",
+        tags, ingredients, "times_favorited"
     )
-    list_filter = ("tags", "ingredients")
-    list_editable = ("tags", )
+    list_filter = ("tags", "author", "name")
     search_fields = ("name", )
-
-    @admin.display(
-        description='tags',
-    )
-    def tags(self, obj):
-        return ', '.join(
-            [tag.name for tag in obj.tags.all()]
-        )
-
-    @admin.display(
-        description='ingredients',
-    )
-    def ingredients(self, obj):
-        return ', '.join(
-            # TODO indicate quantities as well
-            [ingredient.name for ingredient in obj.ingredients.all()]
-        )
+    inlines = (RecipeTagInline, AmountInline)
 
 
-@admin.register(Quantity)
-class QuantityAdmin(EmptyValueDisplay):
-    list_display = ("id", "recipe", "ingredient", "quantity")
+@admin.register(FavoriteItem)
+class FavoriteItemAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "recipe")
+
+
+@admin.register(CartItem)
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "recipe")

@@ -35,9 +35,15 @@ class CustomUser(AbstractUser):
         error_messages={"unique": "user with this username already exists."},
     )
 
+    class Meta(AbstractUser.Meta):
+        ordering = ("username", )
+
     @property
     def recipes_count(self):
         return self.recipes.count()
+
+    def __str__(self):
+        return self.username
 
 
 class Subscription(WithTimestamps):

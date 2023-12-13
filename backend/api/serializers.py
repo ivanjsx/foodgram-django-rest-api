@@ -6,7 +6,8 @@ from rest_framework.serializers import (CharField, IntegerField,
                                         PrimaryKeyRelatedField, Serializer,
                                         SerializerMethodField, ValidationError)
 
-from recipes.models import Amount, Ingredient, Recipe, RecipeTag, Tag
+from recipes.models import (Ingredient, IngredientAmountInRecipe, Recipe,
+                            RecipeTag, Tag)
 
 from .fields import (Base64ImageField, StringToBoolField,
                      StringToNaturalNumberField)
@@ -142,7 +143,7 @@ class AmountOutputSerializer(ModelSerializer):
     measurement_unit = CharField(source="ingredient.measurement_unit")
 
     class Meta:
-        model = Amount
+        model = IngredientAmountInRecipe
         fields = ("id", "name", "measurement_unit", "amount")
 
 
@@ -209,9 +210,9 @@ class DefaultRecipeSerializer(ModelSerializer):
             RecipeTag.objects.create(recipe=recipe, tag=tag)
         for data in ingredients:
             ingredient = get_object_or_404(Ingredient, id=data["id"])
-            Amount.objects.create(recipe=recipe,
-                                  ingredient=ingredient,
-                                  amount=data["amount"])
+            IngredientAmountInRecipe.objects.create(recipe=recipe,
+                                                    ingredient=ingredient,
+                                                    amount=data["amount"])
         return recipe
 
     def update(self, instance, validated_data):
@@ -223,10 +224,10 @@ class DefaultRecipeSerializer(ModelSerializer):
             for tag in tags:
                 RecipeTag.objects.create(recipe=instance, tag=tag)
         if ingredients:
-            Amount.objects.filter(recipe=instance).delete()
+            IngredientAmountInRecipe.objects.filter(recipe=instance).delete()
             for data in ingredients:
                 ingredient = get_object_or_404(Ingredient, id=data["id"])
-                Amount.objects.create(recipe=instance,
-                                      ingredient=ingredient,
-                                      amount=data["amount"])
+                IngredientAmountInRecipe.objects.create(recipe=instance,
+                                                        ingredient=ingredient,
+                                                        amount=data["amount"])
         return instance
