@@ -155,3 +155,15 @@ class DefaultRecipeSerializer(ModelSerializer):
             return False
         return user.cart.filter(recipe=obj).exists()
 
+    def create(self, validated_data):
+        tags = validated_data.pop("tags", [])
+        ingredients = validated_data.pop("ingredients", [])
+        recipe = Recipe.objects.create(**validated_data)
+        for tag in tags:
+            RecipeTag.objects.create(recipe=recipe, tag=tag)
+        for data in ingredients:
+            ingredient = get_object_or_404(Ingredient, id=data["id"])
+            Amount.objects.create(recipe=recipe,
+                                  ingredient=ingredient,
+                                  amount=data["amount"])
+        return recipe
