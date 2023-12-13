@@ -14,6 +14,16 @@ from .fields import (Base64ImageField, StringToBoolField,
 User = get_user_model()
 
 
+class QueryParamsSerializer(Serializer):
+
+    pk = StringToNaturalNumberField(required=False)
+    is_favorited = StringToBoolField(required=False)
+    is_in_shopping_cart = StringToBoolField(required=False)
+    recipes_limit = StringToNaturalNumberField(required=False)
+
+    class Meta:
+        fields = ("pk", "is_favorited", "is_in_shopping_cart", "recipes_limit")
+
 
 class TagSerializer(ModelSerializer):
 
