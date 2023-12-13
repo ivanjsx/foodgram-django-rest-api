@@ -98,3 +98,19 @@ class RecipeViewSet(ModelViewSet, PartialUpdateOnlyMixin):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+    @action(detail=True,
+            permission_classes=(IsAuthenticated, ),
+            methods=(HTTPMethod.POST, HTTPMethod.DELETE))
+    def favorite(self, request, pk=None):
+        if request.method == HTTPMethod.POST:
+            return add_recipe_to_user_list(Favorite, request.user, pk)
+        return remove_recipe_from_user_list(Favorite, request.user, pk)
+
+    @action(detail=True,
+            permission_classes=(IsAuthenticated, ),
+            methods=(HTTPMethod.POST, HTTPMethod.DELETE))
+    def shopping_cart(self, request, pk=None):
+        if request.method == HTTPMethod.POST:
+            return add_recipe_to_user_list(Cart, request.user, pk)
+        return remove_recipe_from_user_list(Cart, request.user, pk)
+

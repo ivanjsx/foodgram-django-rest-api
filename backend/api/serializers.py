@@ -36,6 +36,14 @@ class IngredientSerializer(ModelSerializer):
         fields = ("id", "name", "measurement_unit")
 
 
+class MinifiedRecipeSerializer(ModelSerializer):
+
+    image = Base64ImageField(use_url=True)
+
+    class Meta:
+        model = Recipe
+        fields = ("id", "name", "image", "cooking_time")
+
 
 class UserShowSerializer(ModelSerializer):
 
