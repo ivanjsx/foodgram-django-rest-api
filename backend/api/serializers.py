@@ -142,3 +142,16 @@ class DefaultRecipeSerializer(ModelSerializer):
         if len(value) != len({item["id"] for item in value}):
             raise ValidationError("cannot add multiple identical ingredients")
         return value
+
+    def get_is_favorited(self, obj):
+        user = self.context["request"].user
+        if not user.is_authenticated:
+            return False
+        return user.favorites.filter(recipe=obj).exists()
+
+    def get_is_in_shopping_cart(self, obj):
+        user = self.context["request"].user
+        if not user.is_authenticated:
+            return False
+        return user.cart.filter(recipe=obj).exists()
+
