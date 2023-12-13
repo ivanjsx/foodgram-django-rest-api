@@ -2,6 +2,20 @@ from rest_framework.permissions import (SAFE_METHODS, AllowAny, BasePermission,
                                         IsAuthenticatedOrReadOnly)
 
 
+class RecipeViewSetPermission(IsAuthenticatedOrReadOnly):
+    """
+    Safe methods are allowed to all users, including anonymous.
+    To create a recipe, authentication is required.
+    Once created, for further unsafe operations on a recipe,
+    authentication as the recipe author is required.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        return (
+            request.method in SAFE_METHODS
+            or request.user == obj.author
+        )
+
 
 class UserViewSetPermission(AllowAny):
     """

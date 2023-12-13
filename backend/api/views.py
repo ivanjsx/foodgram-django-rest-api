@@ -92,6 +92,8 @@ class UserViewSet(GenericViewSet, ListCreateRetrieveMixin):
 class RecipeViewSet(ModelViewSet, PartialUpdateOnlyMixin):
 
     serializer_class = DefaultRecipeSerializer
+    permission_classes = (RecipeViewSetPermission, )
+    pagination_class = CustomPageSizePagination
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
