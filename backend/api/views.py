@@ -165,4 +165,6 @@ class RecipeViewSet(ModelViewSet, PartialUpdateOnlyMixin):
         ).prefetch_related("ingredients").all()
         cart = reduce_cart(queryset)
         fileformat = request.query_params.get("fileformat", "txt")
+        if fileformat == "csv":
+            return create_csv_response(cart)
         return create_txt_response(cart)

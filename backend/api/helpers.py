@@ -90,6 +90,20 @@ def reduce_cart(shopping_cart):
     return output
 
 
+def create_csv_response(shopping_cart):
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = (
+        'attachment; filename="shopping_cart.csv"'
+    )
+    writer = csv.writer(response)
+    writer.writerow(["Список продуктов"])
+    for _, ingredient in shopping_cart.items():
+        writer.writerow([ingredient["name"],
+                         ingredient["amount"],
+                         ingredient["measurement_unit"]])
+    return response
+
+
 def create_txt_response(shopping_cart):
     response = HttpResponse(content_type="text/plain")
     response["Content-Disposition"] = (
