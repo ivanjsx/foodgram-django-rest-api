@@ -17,3 +17,16 @@ class FilterIngredientsByName(FilterSet):
         model = Ingredient
         fields = ("name", )
 
+
+class FilterRecipesByTagsAndAuthor(FilterSet):
+    """
+    Custom filter implementation for Recipe model viewset.
+    """
+
+    tags = AllValuesMultipleFilter(field_name="tags__slug")
+    author = NumberFilter(field_name="author__id", lookup_expr="exact")
+
+    class Meta:
+        model = Recipe
+        fields = ("tags", "author")
+

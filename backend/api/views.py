@@ -94,6 +94,8 @@ class RecipeViewSet(ModelViewSet, PartialUpdateOnlyMixin):
     serializer_class = DefaultRecipeSerializer
     permission_classes = (RecipeViewSetPermission, )
     pagination_class = CustomPageSizePagination
+    filterset_class = FilterRecipesByTagsAndAuthor
+
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
