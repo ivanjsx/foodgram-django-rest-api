@@ -1,9 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db.models import (CASCADE, CharField, ForeignKey, ImageField,
-                              IntegerField, ManyToManyField, Model,
-                              PositiveSmallIntegerField, SlugField, TextField,
-                              UniqueConstraint)
+                              IntegerField, Model, PositiveSmallIntegerField,
+                              SlugField, TextField, UniqueConstraint)
 
 from core.models import WithTimestamps
 
@@ -94,7 +93,7 @@ class Recipe(WithTimestamps, WithName):
     )
     cooking_time = PositiveSmallIntegerField(
         verbose_name="Cooking time, in minutes",
-        help_text="Provide a cooking, in minutes",
+        help_text="Provide a cooking time, in minutes",
         validators=(MinValueValidator(1), )
     )
     author = ForeignKey(
@@ -108,16 +107,13 @@ class Recipe(WithTimestamps, WithName):
         verbose_name="Cover image",
         help_text="Upload a cover image",
     )
-    tags = ManyToManyField(
-        blank=True,
-        to=Tag,
-        through="RecipeTag",
-        verbose_name="Set of tags",
-        help_text="Provide a set of tags it belongs to",
-    )
 
     class Meta:
         ordering = ("-created", )
+
+    @property
+    def times_favorited(self):
+        return self.favorites_in.count()
 
 
 class RecipeTag(WithTimestamps):
@@ -128,14 +124,13 @@ class RecipeTag(WithTimestamps):
 
     recipe = ForeignKey(
         to=Recipe,
-        editable=False,
         on_delete=CASCADE,
+        related_name="tags",
     )
     tag = ForeignKey(
         to=Tag,
-        editable=False,
         on_delete=CASCADE,
-        related_name="recipes",
+        related_name="recipes_on",
     )
 
     class Meta:
@@ -158,15 +153,13 @@ class Amount(WithTimestamps):
 
     recipe = ForeignKey(
         to=Recipe,
-        editable=False,
         on_delete=CASCADE,
         related_name="ingredients",
     )
     ingredient = ForeignKey(
         to=Ingredient,
-        editable=False,
         on_delete=CASCADE,
-        related_name="recipes",
+        related_name="recipes_in",
     )
     amount = IntegerField(
         verbose_name="amount",
@@ -186,22 +179,20 @@ class Amount(WithTimestamps):
         return f"{self.recipe} includes {self.amount} of {self.ingredient}"
 
 
-class Favorite(WithTimestamps):
+class FavoriteItem(WithTimestamps):
     """
     Lets users add recipes to their Favorites list.
     """
 
     user = ForeignKey(
         to=User,
-        editable=False,
         on_delete=CASCADE,
-        related_name="favorites",
+        related_name="favorite",
     )
     recipe = ForeignKey(
         to=Recipe,
-        editable=False,
         on_delete=CASCADE,
-        related_name="in_favorites",
+        related_name="favorites_in",
     )
 
     class Meta:
@@ -216,22 +207,20 @@ class Favorite(WithTimestamps):
         return f"{self.user} has {self.recipe} in their favorites"
 
 
-class Cart(WithTimestamps):
+class CartItem(WithTimestamps):
     """
     Lets users add recipes to their Shopping Cart list.
     """
 
     user = ForeignKey(
         to=User,
-        editable=False,
         on_delete=CASCADE,
         related_name="cart",
     )
     recipe = ForeignKey(
         to=Recipe,
-        editable=False,
         on_delete=CASCADE,
-        related_name="in_cart",
+        related_name="carts_in",
     )
 
     class Meta:

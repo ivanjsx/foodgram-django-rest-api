@@ -48,14 +48,12 @@ class Subscription(WithTimestamps):
     follower = ForeignKey(
         verbose_name="follower",
         to=CustomUser,
-        editable=False,
         on_delete=CASCADE,
         related_name="following",
     )
     influencer = ForeignKey(
         verbose_name="influencer",
         to=CustomUser,
-        editable=False,
         on_delete=CASCADE,
         related_name="followers",
     )

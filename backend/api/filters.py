@@ -3,7 +3,7 @@ from django_filters.rest_framework import (AllValuesMultipleFilter, CharFilter,
 
 from django.db.models import OuterRef, Subquery
 
-from recipes.models import Cart, Favorite, Ingredient, Recipe
+from recipes.models import CartItem, FavoriteItem, Ingredient, Recipe
 
 
 class FilterIngredientsByName(FilterSet):
@@ -55,15 +55,15 @@ def filter_recipes_by_query_params(queryset, user, params):
         )
 
     if params.get("is_favorited", None) is True:
-        queryset = inner_join(queryset, subquery(Favorite, user))
+        queryset = inner_join(queryset, subquery(FavoriteItem, user))
 
     if params.get("is_favorited", None) is False:
-        queryset = outer_join(queryset, subquery(Favorite, user))
+        queryset = outer_join(queryset, subquery(FavoriteItem, user))
 
     if params.get("is_in_shopping_cart", None) is True:
-        queryset = inner_join(queryset, subquery(Cart, user))
+        queryset = inner_join(queryset, subquery(CartItem, user))
 
     if params.get("is_in_shopping_cart", None) is False:
-        return outer_join(queryset, subquery(Cart, user))
+        return outer_join(queryset, subquery(CartItem, user))
 
     return queryset

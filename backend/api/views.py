@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
-from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag
+from recipes.models import CartItem, FavoriteItem, Ingredient, Recipe, Tag
 
 from .filters import (FilterIngredientsByName, FilterRecipesByTagsAndAuthor,
                       filter_recipes_by_query_params)
@@ -145,23 +145,23 @@ class RecipeViewSet(ModelViewSet, PartialUpdateOnlyMixin):
             methods=(HTTPMethod.POST, HTTPMethod.DELETE))
     def favorite(self, request, pk=None):
         if request.method == HTTPMethod.POST:
-            return add_recipe_to_user_list(Favorite, request.user, pk)
-        return remove_recipe_from_user_list(Favorite, request.user, pk)
+            return add_recipe_to_user_list(FavoriteItem, request.user, pk)
+        return remove_recipe_from_user_list(FavoriteItem, request.user, pk)
 
     @action(detail=True,
             permission_classes=(IsAuthenticated, ),
             methods=(HTTPMethod.POST, HTTPMethod.DELETE))
     def shopping_cart(self, request, pk=None):
         if request.method == HTTPMethod.POST:
-            return add_recipe_to_user_list(Cart, request.user, pk)
-        return remove_recipe_from_user_list(Cart, request.user, pk)
+            return add_recipe_to_user_list(CartItem, request.user, pk)
+        return remove_recipe_from_user_list(CartItem, request.user, pk)
 
     @action(detail=False,
             methods=(HTTPMethod.GET, ),
             permission_classes=(IsAuthenticated, ))
     def download_shopping_cart(self, request):
         queryset = Recipe.objects.filter(
-            in_cart__user=request.user.id
+            carts_in__user=request.user.id
         ).prefetch_related("ingredients").all()
         cart = reduce_cart(queryset)
         fileformat = request.query_params.get("fileformat", "txt")
