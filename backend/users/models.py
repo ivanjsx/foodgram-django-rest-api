@@ -1,46 +1,78 @@
-from django.contrib.auth import get_user_model
-from django.db.models import (
-    CheckConstraint, CASCADE, F, ForeignKey, Q, UniqueConstraint
-)
+from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.db.models import (CASCADE, CharField, CheckConstraint, EmailField,
+                              F, ForeignKey, Q, UniqueConstraint)
 
 from core.models import WithTimestamps
 
-User = get_user_model()
+from .constants import MAX_NAME_LENGTH
+from .validators import reserved_username_validator
+
+
+class CustomUser(AbstractUser):
+    """
+    User model. Customized with respect to built-in model to disallow
+    blank fields, validate against reserved usernames and define properties.
+    """
+
+    first_name = CharField(
+        verbose_name="first name",
+        max_length=MAX_NAME_LENGTH,
+    )
+    last_name = CharField(
+        verbose_name="last name",
+        max_length=MAX_NAME_LENGTH
+    )
+    email = EmailField(
+        verbose_name="email address",
+        unique=True,
+    )
+    username = CharField(
+        verbose_name="username",
+        unique=True,
+        max_length=MAX_NAME_LENGTH,
+        validators=(UnicodeUsernameValidator(), reserved_username_validator),
+        error_messages={"unique": "user with this username already exists."},
+    )
+
+    @property
+    def recipes_count(self):
+        return self.recipes.count()
 
 
 class Subscription(WithTimestamps):
     """
-    Subscription of a user to another user on the platform.
+    Subscription (act of following) of a user to another user on the platform.
     """
 
     follower = ForeignKey(
-        to=User,
+        verbose_name="follower",
+        to=CustomUser,
         editable=False,
         on_delete=CASCADE,
         related_name="following",
-        verbose_name="follower",
     )
     influencer = ForeignKey(
-        to=User,
+        verbose_name="influencer",
+        to=CustomUser,
         editable=False,
         on_delete=CASCADE,
         related_name="followers",
-        verbose_name="influencer",
     )
 
     class Meta:
         constraints = (
             UniqueConstraint(
-                fields=["follower", "influencer"],
-                name="follower & influencer must make a unique pair",
+                fields=("follower", "influencer"),
+                name="already following this user"
             ),
             CheckConstraint(
                 check=~Q(
                     follower=F("influencer")
                 ),
-                name="cannot follow yourself",
+                name="you cannot follow yourself",
             ),
         )
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.follower} follows {self.influencer}"
