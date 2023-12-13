@@ -129,3 +129,16 @@ class DefaultRecipeSerializer(ModelSerializer):
         fields = ("id", "name", "text", "cooking_time", "author", "image",
                   "tags", "ingredients", "is_favorited", "is_in_shopping_cart")
 
+    def validate_tags(self, value):
+        if len(value) == 0:
+            raise ValidationError("recipe requires at least 1 tag")
+        if len(value) != len(set(value)):
+            raise ValidationError("cannot assign multiple identical tags")
+        return value
+
+    def validate_ingredients(self, value):
+        if len(value) == 0:
+            raise ValidationError("recipe requires at least 1 ingredient")
+        if len(value) != len({item["id"] for item in value}):
+            raise ValidationError("cannot add multiple identical ingredients")
+        return value
