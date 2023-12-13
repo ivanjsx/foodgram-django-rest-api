@@ -61,6 +61,27 @@ class UserShowSerializer(ModelSerializer):
         return user.following.filter(influencer=obj).exists()
 
 
+class ExtendedUserShowSerializer(UserShowSerializer):
+
+    recipes = SerializerMethodField()
+
+    class Meta(UserShowSerializer.Meta):
+        fields = ("email", "id", "username", "first_name", "last_name",
+                  "is_subscribed", "recipes", "recipes_count")
+
+    def get_recipes(self, obj):
+        recipes = obj.recipes.all()
+        limit = self.context["request"].query_params.get("recipes_limit", None)
+        if limit:
+            serializer = QueryParamsSerializer(data={"recipes_limit": limit})
+            serializer.is_valid(raise_exception=True)
+            validated_limit = serializer.validated_data["recipes_limit"]
+            recipes = recipes[:validated_limit]
+        serializer = MinifiedRecipeSerializer(
+            instance=recipes, many=True, read_only=True
+        )
+        return serializer.data
+
 
 class UserCreateSerializer(ModelSerializer):
 
