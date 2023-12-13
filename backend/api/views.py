@@ -68,3 +68,11 @@ class UserViewSet(GenericViewSet, ListCreateRetrieveMixin):
     def me(self, request):
         serializer = self.get_serializer(instance=request.user)
         return Response(data=serializer.data, status=HTTP_200_OK)
+
+    @action(detail=False,
+            methods=(HTTPMethod.POST, ),
+            url_path="set_password",
+            permission_classes=(IsAuthenticated, ))
+    def set_own_password(self, request):
+        return set_new_password(request.user, request.data)
+

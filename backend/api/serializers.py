@@ -21,9 +21,6 @@ class QueryParamsSerializer(Serializer):
     is_in_shopping_cart = StringToBoolField(required=False)
     recipes_limit = StringToNaturalNumberField(required=False)
 
-    class Meta:
-        fields = ("pk", "is_favorited", "is_in_shopping_cart", "recipes_limit")
-
 
 class TagSerializer(ModelSerializer):
 
@@ -70,3 +67,8 @@ class UserCreateSerializer(ModelSerializer):
                                               self.context["request"].user)
         return value
 
+
+class ChangePasswordSerializer(Serializer):
+
+    current_password = CharField(required=True)
+    new_password = CharField(required=True)
