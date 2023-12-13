@@ -72,3 +72,25 @@ class ChangePasswordSerializer(Serializer):
 
     current_password = CharField(required=True)
     new_password = CharField(required=True)
+
+    def validate_current_password(self, value):
+        user = self.context["user"]
+        if not user.check_password(value):
+            raise ValidationError(
+                "your current password is incorrect"
+            )
+        return value
+
+    def validate_new_password(self, value):
+        password_validation.validate_password(
+            value, self.context["user"]
+        )
+        return value
+
+    def validate(self, data):
+        if data["new_password"] == data["current_password"]:
+            raise ValidationError(
+                "your new password shall differ from current"
+            )
+        return data
+
