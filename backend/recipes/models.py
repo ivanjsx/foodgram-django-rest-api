@@ -1,20 +1,26 @@
-from colorfield.fields import ColorField
 from django.contrib.auth import get_user_model
-from django.db.models import (
-    CASCADE, CharField, FloatField, ForeignKey, ImageField, ManyToManyField,
-    Model, PositiveSmallIntegerField, SlugField, TextField, UniqueConstraint,
-)
+from django.core.validators import MinValueValidator
+from django.db.models import (CASCADE, CharField, ForeignKey, ImageField,
+                              IntegerField, ManyToManyField, Model,
+                              PositiveSmallIntegerField, SlugField, TextField,
+                              UniqueConstraint)
 
 from core.models import WithTimestamps
 
-from .constants import MAX_TITLE_LENGTH, MAX_UNIT_LENGTH
+from .constants import MAX_NAME_LENGTH, MAX_SLUG_LENGTH, MAX_UNIT_LENGTH
+from .validators import hex_color_validator
 
 User = get_user_model()
 
 
-class WithTitle(Model):
+class WithName(Model):
+    """
+    Abstract model. Adds the `name` field to any successor, and orders
+    instances with respect to it (unless explicitly specified otherwise).
+    """
+
     name = CharField(
-        max_length=MAX_TITLE_LENGTH,
+        max_length=MAX_NAME_LENGTH,
         verbose_name="name",
         help_text="Provide a name",
     )
@@ -27,25 +33,27 @@ class WithTitle(Model):
         return self.name
 
 
-class Tag(WithTimestamps, WithTitle):
+class Tag(WithTimestamps, WithName):
     """
-    A tag, which the recipe may or may not be tagged with.
+    A tag, which the recipe is tagged with.
+    May be multiple thereof on a single recipe.
     """
 
     slug = SlugField(
         unique=True,
+        max_length=MAX_SLUG_LENGTH,
         verbose_name="slug",
         help_text="Provide a unique slug (will be used in the URL address)",
     )
-    hex_color = ColorField(
+    color = CharField(
         unique=True,
-        default="#FF0000",
+        max_length=7,
         verbose_name="color",
         help_text="Provide a unique color",
+        validators=(hex_color_validator, )
     )
 
-    class Meta(WithTitle.Meta):
-        default_related_name = "tags"
+    class Meta(WithName.Meta):
         constraints = (
             UniqueConstraint(
                 fields=("name", ),
@@ -54,9 +62,10 @@ class Tag(WithTimestamps, WithTitle):
         )
 
 
-class Ingredient(WithTimestamps, WithTitle):
+class Ingredient(WithTimestamps, WithName):
     """
     An ingredient, which the recipe includes.
+    Obligatory to include at least 1 in each recipe.
     """
 
     measurement_unit = CharField(
@@ -65,8 +74,7 @@ class Ingredient(WithTimestamps, WithTitle):
         help_text="Provide a measurement unit",
     )
 
-    class Meta(WithTitle.Meta):
-        default_related_name = "ingredients"
+    class Meta(WithName.Meta):
         constraints = (
             UniqueConstraint(
                 fields=("name", "measurement_unit"),
@@ -75,34 +83,30 @@ class Ingredient(WithTimestamps, WithTitle):
         )
 
 
-class Recipe(WithTimestamps, WithTitle):
+class Recipe(WithTimestamps, WithName):
     """
     A recipe, the cornerstone for the app functionality.
     """
 
-    description = TextField(
+    text = TextField(
         verbose_name="description",
         help_text="Provide a description",
     )
     cooking_time = PositiveSmallIntegerField(
         verbose_name="Cooking time, in minutes",
         help_text="Provide a cooking, in minutes",
+        validators=(MinValueValidator(1), )
     )
     author = ForeignKey(
         to=User,
         on_delete=CASCADE,
         verbose_name="author",
+        related_name="recipes",
     )
-    cover_image = ImageField(
+    image = ImageField(
         upload_to="recipes/",
         verbose_name="Cover image",
         help_text="Upload a cover image",
-    )
-    ingredients = ManyToManyField(
-        to=Ingredient,
-        through="Quantity",
-        verbose_name="Set of ingredients",
-        help_text="Provide a set of ingredients it includes",
     )
     tags = ManyToManyField(
         blank=True,
@@ -112,8 +116,7 @@ class Recipe(WithTimestamps, WithTitle):
         help_text="Provide a set of tags it belongs to",
     )
 
-    class Meta(WithTitle.Meta):
-        default_related_name = "recipes"
+    class Meta:
         ordering = ("-created", )
 
 
@@ -132,6 +135,7 @@ class RecipeTag(WithTimestamps):
         to=Tag,
         editable=False,
         on_delete=CASCADE,
+        related_name="recipes",
     )
 
     class Meta:
@@ -146,29 +150,31 @@ class RecipeTag(WithTimestamps):
         return f"{self.recipe} is tagged with {self.tag}"
 
 
-class Quantity(WithTimestamps):
+class Amount(WithTimestamps):
     """
     Implements Many-to-Many Relationship between a recipe and an ingredient.
-    Defined explicitly to indicate additional data (like quantity).
+    Defined explicitly to indicate additional data (for instance, amount).
     """
 
     recipe = ForeignKey(
         to=Recipe,
         editable=False,
         on_delete=CASCADE,
+        related_name="ingredients",
     )
     ingredient = ForeignKey(
         to=Ingredient,
         editable=False,
         on_delete=CASCADE,
+        related_name="recipes",
     )
-    quantity = FloatField(
-        verbose_name="quantity",
-        help_text="Provide a quantity needed",
+    amount = IntegerField(
+        verbose_name="amount",
+        help_text="Provide the amount needed",
+        validators=(MinValueValidator(1), )
     )
 
     class Meta:
-        verbose_name_plural = "Quantities"
         constraints = (
             UniqueConstraint(
                 fields=("recipe", "ingredient"),
@@ -177,32 +183,64 @@ class Quantity(WithTimestamps):
         )
 
     def __str__(self):
-        return f"{self.recipe} includes {self.quantity} of {self.ingredient}"
+        return f"{self.recipe} includes {self.amount} of {self.ingredient}"
 
 
 class Favorite(WithTimestamps):
     """
-    Lets users add recipes to their Favorites list
+    Lets users add recipes to their Favorites list.
     """
 
     user = ForeignKey(
         to=User,
         editable=False,
         on_delete=CASCADE,
+        related_name="favorites",
     )
     recipe = ForeignKey(
         to=Recipe,
         editable=False,
         on_delete=CASCADE,
+        related_name="in_favorites",
     )
 
     class Meta:
         constraints = (
             UniqueConstraint(
                 fields=("user", "recipe"),
-                name="user & recipe must make a unique pair"
+                name="already in favorites"
             ),
         )
 
     def __str__(self):
-        return f"{self.user} has saved {self.recipe} in their favorites"
+        return f"{self.user} has {self.recipe} in their favorites"
+
+
+class Cart(WithTimestamps):
+    """
+    Lets users add recipes to their Shopping Cart list.
+    """
+
+    user = ForeignKey(
+        to=User,
+        editable=False,
+        on_delete=CASCADE,
+        related_name="cart",
+    )
+    recipe = ForeignKey(
+        to=Recipe,
+        editable=False,
+        on_delete=CASCADE,
+        related_name="in_cart",
+    )
+
+    class Meta:
+        constraints = (
+            UniqueConstraint(
+                fields=("user", "recipe"),
+                name="already in shopping cart"
+            ),
+        )
+
+    def __str__(self):
+        return f"{self.user} has {self.recipe} in their shopping cart"
