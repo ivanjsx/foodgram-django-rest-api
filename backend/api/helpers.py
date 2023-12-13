@@ -25,6 +25,35 @@ def set_new_password(user, data):
     user.save()
     return Response(status=HTTP_204_NO_CONTENT)
 
+
+def subscribe_to(pk, request):
+    serializer = QueryParamsSerializer(data={"pk": pk})
+    serializer.is_valid(raise_exception=True)
+    if request.user.id == serializer.validated_data["pk"]:
+        return Response(data={"error": "you cannot follow yourself"},
+                        status=HTTP_400_BAD_REQUEST)
+    subscription, _ = Subscription.objects.get_or_create(
+        follower=request.user,
+        influencer=get_object_or_404(User, id=serializer.validated_data["pk"])
+    )
+    output = ExtendedUserShowSerializer(
+        instance=subscription.influencer,
+        context={"request": request}
+    )
+    return Response(data=output.data, status=HTTP_201_CREATED)
+
+
+def unsubscribe_from(pk, request):
+    serializer = QueryParamsSerializer(data={"pk": pk})
+    serializer.is_valid(raise_exception=True)
+    influencer = get_object_or_404(User, id=serializer.validated_data["pk"])
+    subscription = Subscription.objects.filter(follower=request.user.id,
+                                               influencer=influencer.id)
+    if subscription.exists():
+        subscription.delete()
+    return Response(status=HTTP_204_NO_CONTENT)
+
+
 def add_recipe_to_user_list(list_model, user, pk):
     serializer = QueryParamsSerializer(data={"pk": pk})
     serializer.is_valid(raise_exception=True)

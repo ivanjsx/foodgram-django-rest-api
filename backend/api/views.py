@@ -88,6 +88,13 @@ class UserViewSet(GenericViewSet, ListCreateRetrieveMixin):
             request.data
         )
 
+    @action(detail=True,
+            permission_classes=(IsAuthenticated, ),
+            methods=(HTTPMethod.POST, HTTPMethod.DELETE))
+    def subscribe(self, request, pk=None):
+        if request.method == HTTPMethod.POST:
+            return subscribe_to(pk, request)
+        return unsubscribe_from(pk, request)
 
     @action(detail=False,
             methods=(HTTPMethod.GET, ),
