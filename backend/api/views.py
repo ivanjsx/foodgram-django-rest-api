@@ -156,3 +156,13 @@ class RecipeViewSet(ModelViewSet, PartialUpdateOnlyMixin):
             return add_recipe_to_user_list(Cart, request.user, pk)
         return remove_recipe_from_user_list(Cart, request.user, pk)
 
+    @action(detail=False,
+            methods=(HTTPMethod.GET, ),
+            permission_classes=(IsAuthenticated, ))
+    def download_shopping_cart(self, request):
+        queryset = Recipe.objects.filter(
+            in_cart__user=request.user.id
+        ).prefetch_related("ingredients").all()
+        cart = reduce_cart(queryset)
+        fileformat = request.query_params.get("fileformat", "txt")
+        return create_txt_response(cart)

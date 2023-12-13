@@ -74,3 +74,30 @@ def remove_recipe_from_user_list(list_model, user, pk):
         item.delete()
     return Response(status=HTTP_204_NO_CONTENT)
 
+
+def reduce_cart(shopping_cart):
+    output = {}
+    for recipe in shopping_cart:
+        for amount in recipe.ingredients.all():
+            if amount.ingredient.id not in output.keys():
+                output[amount.ingredient.id] = {
+                    "measurement_unit": amount.ingredient.measurement_unit,
+                    "name": amount.ingredient.name,
+                    "amount": amount.amount,
+                }
+            else:
+                output[amount.ingredient.id]["amount"] += amount.amount
+    return output
+
+
+def create_txt_response(shopping_cart):
+    response = HttpResponse(content_type="text/plain")
+    response["Content-Disposition"] = (
+        'attachment; filename="shopping_cart.txt"'
+    )
+    response.write("Список продуктов\n")
+    for _, ingredient in shopping_cart.items():
+        response.write(f"{ingredient['name']}: "
+                       f"{ingredient['amount']} "
+                       f"{ingredient['measurement_unit']}\n")
+    return response
