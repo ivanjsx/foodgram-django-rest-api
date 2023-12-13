@@ -96,6 +96,22 @@ class RecipeViewSet(ModelViewSet, PartialUpdateOnlyMixin):
     pagination_class = CustomPageSizePagination
     filterset_class = FilterRecipesByTagsAndAuthor
 
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Recipe.objects.all()
+        params = self.request.query_params
+
+        data = {}
+        if params.get("is_favorited", None):
+            data["is_favorited"] = params["is_favorited"]
+        if params.get("is_in_shopping_cart", None):
+            data["is_in_shopping_cart"] = params["is_in_shopping_cart"]
+
+        serializer = QueryParamsSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        return filter_recipes_by_query_params(
+            queryset, user, serializer.validated_data
+        )
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
