@@ -167,3 +167,20 @@ class DefaultRecipeSerializer(ModelSerializer):
                                   ingredient=ingredient,
                                   amount=data["amount"])
         return recipe
+
+    def update(self, instance, validated_data):
+        tags = validated_data.pop("tags", None)
+        ingredients = validated_data.pop("ingredients", None)
+        instance = super().update(instance, validated_data)
+        if tags:
+            RecipeTag.objects.filter(recipe=instance).delete()
+            for tag in tags:
+                RecipeTag.objects.create(recipe=instance, tag=tag)
+        if ingredients:
+            Amount.objects.filter(recipe=instance).delete()
+            for data in ingredients:
+                ingredient = get_object_or_404(Ingredient, id=data["id"])
+                Amount.objects.create(recipe=instance,
+                                      ingredient=ingredient,
+                                      amount=data["amount"])
+        return instance
