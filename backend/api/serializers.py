@@ -29,3 +29,34 @@ class IngredientSerializer(ModelSerializer):
         fields = ("id", "name", "measurement_unit")
 
 
+
+class UserShowSerializer(ModelSerializer):
+
+    is_subscribed = SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ("email", "id", "username", "first_name", "last_name",
+                  "is_subscribed")
+
+    def get_is_subscribed(self, obj):
+        user = self.context["request"].user
+        if not user.is_authenticated:
+            return False
+        return user.following.filter(influencer=obj).exists()
+
+
+
+class UserCreateSerializer(ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ("email", "id", "username", "first_name", "last_name",
+                  "password")
+        extra_kwargs = {"password": {"required": True, "write_only": True}}
+
+    def validate_password(self, value):
+        password_validation.validate_password(value,
+                                              self.context["request"].user)
+        return value
+

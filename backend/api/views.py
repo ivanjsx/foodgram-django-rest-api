@@ -45,3 +45,19 @@ class IngredientViewSet(ModelViewSet):
     permission_classes = (IsAdminOrReadOnly, )
     filterset_class = FilterIngredientsByName
 
+
+class UserViewSet(GenericViewSet, ListCreateRetrieveMixin):
+
+    queryset = User.objects.all()
+    permission_classes = (UserViewSetPermission, )
+    pagination_class = CustomPageSizePagination
+
+    def get_serializer_class(self):
+        if self.request.method in SAFE_METHODS:
+            return UserShowSerializer
+        return UserCreateSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(
+            password=make_password(serializer.validated_data["password"])
+        )
