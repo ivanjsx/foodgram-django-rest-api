@@ -88,3 +88,11 @@ class UserViewSet(GenericViewSet, ListCreateRetrieveMixin):
             request.data
         )
 
+
+class RecipeViewSet(ModelViewSet, PartialUpdateOnlyMixin):
+
+    serializer_class = DefaultRecipeSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+

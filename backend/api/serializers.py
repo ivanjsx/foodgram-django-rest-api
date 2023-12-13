@@ -94,3 +94,30 @@ class ChangePasswordSerializer(Serializer):
             )
         return data
 
+
+class AmountInputSerializer(Serializer):
+
+    id = IntegerField()
+    amount = IntegerField(write_only=True, min_value=1)
+
+    def validate_id(self, value):
+        if not Ingredient.objects.filter(id=value).exists():
+            raise ValidationError("ingredient with provided id does not exist")
+        return value
+
+
+class DefaultRecipeSerializer(ModelSerializer):
+
+    author = UserShowSerializer(required=False)
+    image = Base64ImageField(use_url=True)
+    ingredients = AmountInputSerializer(many=True)
+    tags = PrimaryKeyRelatedField(many=True,
+                                  queryset=Tag.objects.all())
+    is_favorited = SerializerMethodField()
+    is_in_shopping_cart = SerializerMethodField()
+
+    class Meta:
+        model = Recipe
+        fields = ("id", "name", "text", "cooking_time", "author", "image",
+                  "tags", "ingredients", "is_favorited", "is_in_shopping_cart")
+
