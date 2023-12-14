@@ -14,7 +14,7 @@ services:
       - pg_data:/var/lib/postgresql/data
   
   backend:
-    build: ../backend/
+    image: ivanjsx/foodgram_backend:latest
     env_file: ../.env
     volumes:
       - media_volume:/media
@@ -23,12 +23,12 @@ services:
       - db
   
   frontend:
-    build: ../frontend/
+    image: ivanjsx/foodgram_frontend:latest
     volumes:
       - static_volume:/frontend_static
   
   nginx:
-    build: ../gateway/
+    image: ivanjsx/foodgram_gateway:latest
     ports:
       - 80:80
     volumes:
