@@ -1,5 +1,9 @@
 name,slug,color
-завтрак,breakfast,#ffff00
-обед,lunch,#0000ff
-ужин,dinner,#00ffff
-перекус,snack,#ff00ff
+завтрак,breakfast,#FF0000
+бранч,brunch,#FFA500
+обед,lunch,#FFD700
+ужин,dinner,#32CD32
+перекус,snack,#00BFFF
+десерт,sweet,#4169E1
+салат,salad,#4B0082
+коктейль,cocktail,#9400D3
