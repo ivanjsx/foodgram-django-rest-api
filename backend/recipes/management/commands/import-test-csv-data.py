@@ -19,10 +19,10 @@ DATA_DIRECTORY = "data"
 
 MODEL_MAPPING = {
     "tags.csv": Tag,
-    "users.csv": User,
-    "recipes.csv": Recipe,
+    # "users.csv": User,
+    # "recipes.csv": Recipe,
     "ingredients.csv": Ingredient,
-    "subscriptions.csv": Subscription,
+    # "subscriptions.csv": Subscription,
 }
 
 

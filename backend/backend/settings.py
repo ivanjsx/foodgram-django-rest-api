@@ -69,13 +69,18 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # Database
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'django_db'),
-        'USER': os.getenv('POSTGRES_USER', 'django_user'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'django_password'),
-        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
-        'PORT': os.getenv('DB_PORT', 5432)
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+    }
+} if os.getenv("DEBUG") == "True" else {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("POSTGRES_DB", "django_db"),
+        "USER": os.getenv("POSTGRES_USER", "django_user"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "django_password"),
+        "HOST": os.getenv("DB_HOST", "127.0.0.1"),
+        "PORT": os.getenv("DB_PORT", 5432)
     }
 }
 
@@ -114,7 +119,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 
 STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "collected_static")
+STATIC_ROOT = os.path.join(BASE_DIR, "backend_static")
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
