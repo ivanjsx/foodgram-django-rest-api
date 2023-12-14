@@ -30,7 +30,7 @@ services:
   nginx:
     build: ../gateway/
     ports:
-      - 80:80
+      - 9000:80
     volumes:
       - media_volume:/media
       - static_volume:/static
