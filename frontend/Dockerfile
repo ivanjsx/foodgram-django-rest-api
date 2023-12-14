@@ -1,3 +1,3 @@
-FROM scratch
+FROM alpine:latest
 WORKDIR /
-CMD ["cp", "-r", "build/.", "/frontend_static/"]
+CMD ["cp", "-r", "/build/.", "/frontend_static/"]
