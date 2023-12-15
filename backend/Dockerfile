@@ -1,4 +1,5 @@
 FROM python:3.11
+WORKDIR /
 RUN pip install --upgrade pip
 RUN pip install gunicorn
 COPY requirements.txt .

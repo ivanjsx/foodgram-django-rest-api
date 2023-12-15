@@ -25,7 +25,7 @@ services:
   frontend:
     build: ../frontend/
     volumes:
-      - static_volume:/frontend_static
+      - static_volume:/app/result_build
   
   gateway:
     build: ../gateway/
