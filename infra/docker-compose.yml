@@ -24,8 +24,9 @@ services:
   
   frontend:
     build: ../frontend/
+    command: cp -r /app/build/. /frontend_static/
     volumes:
-      - static_volume:/app/result_build
+      - static_volume:/frontend_static
   
   gateway:
     build: ../gateway/
@@ -33,6 +34,6 @@ services:
       - 9000:80
     volumes:
       - media_volume:/media
-      - static_volume:/static
+      - static_volume:/static/
     depends_on:
       - backend      
