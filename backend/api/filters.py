@@ -1,9 +1,10 @@
-from django_filters.rest_framework import (AllValuesMultipleFilter, CharFilter,
-                                           FilterSet, NumberFilter)
+from django_filters.rest_framework import (CharFilter, FilterSet,
+                                           ModelMultipleChoiceFilter,
+                                           NumberFilter)
 
 from django.db.models import OuterRef, Subquery
 
-from recipes.models import CartItem, FavoriteItem, Ingredient, Recipe
+from recipes.models import CartItem, FavoriteItem, Ingredient, Recipe, Tag
 
 
 class FilterIngredientsByName(FilterSet):
@@ -23,8 +24,12 @@ class FilterRecipesByTagsAndAuthor(FilterSet):
     Custom filter implementation for Recipe model viewset.
     """
 
-    tags = AllValuesMultipleFilter(field_name="tags__slug")
     author = NumberFilter(field_name="author__id", lookup_expr="exact")
+    tags = ModelMultipleChoiceFilter(
+        queryset=Tag.objects.all(),
+        field_name="tags__slug",
+        to_field_name="slug",
+    )
 
     class Meta:
         model = Recipe
