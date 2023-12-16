@@ -39,7 +39,7 @@ class IngredientSerializer(ModelSerializer):
 
 class MinifiedRecipeSerializer(ModelSerializer):
 
-    image = Base64ImageField(use_url=True)
+    image = Base64ImageField(use_url=False)
 
     class Meta:
         model = Recipe
