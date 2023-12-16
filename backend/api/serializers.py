@@ -150,7 +150,7 @@ class AmountOutputSerializer(ModelSerializer):
 class DefaultRecipeSerializer(ModelSerializer):
 
     author = UserShowSerializer(required=False)
-    image = Base64ImageField(use_url=True)
+    image = Base64ImageField(use_url=False)
     ingredients = AmountInputSerializer(many=True)
     tags = PrimaryKeyRelatedField(many=True,
                                   queryset=Tag.objects.all())
