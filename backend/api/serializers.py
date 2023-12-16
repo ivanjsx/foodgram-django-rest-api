@@ -200,6 +200,7 @@ class DefaultRecipeSerializer(ModelSerializer):
         )
         representation["ingredients"] = ingredients.data
         representation["tags"] = tags.data
+        representation["image"] = instance.image.url
         return representation
 
     def create(self, validated_data):
