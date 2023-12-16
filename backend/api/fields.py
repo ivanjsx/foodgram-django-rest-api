@@ -18,11 +18,6 @@ class Base64ImageField(ImageField):
 
         return super().to_internal_value(data)
 
-    def to_representation(self, value):
-        if value.image:
-            return value.image.url
-        return super().to_representation(value)
-
 
 class StringToNaturalNumberField(CharField):
 
