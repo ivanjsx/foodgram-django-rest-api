@@ -7,6 +7,7 @@
 Проект доступен в интернете по доменному имени https://foodgram.dinosaurivan.net
 
 Джанго-админка проекта доступна по адресу https://foodgram.dinosaurivan.net/admin/
+
 Данные суперюзера для входа в админку:
 - Username: **chef42**
 - Password: **chef**
@@ -31,7 +32,7 @@
 * DRF
 
 ### Особенности использования
-username **me** запрещён к использованию на сайте
+Username **me** запрещён к использованию на сайте
 
 ### Автор
 - [Ваня Шанин](https://t.me/justicewisdom/)
