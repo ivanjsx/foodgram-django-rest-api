@@ -24,6 +24,7 @@
 6. Соберите статику бэкенда командой `docker compose exec backend python manage.py collectstatic`
 7. Скопируйте статику бэкенда в папку, предназначенную для раздачи из nginx командой `docker compose exec backend cp -r /collected_static/. /backend_static/static`
 8. Наполните базу тестовыми данными командой `docker compose exec backend python manage.py import-test-csv-data`. Не применяйте эту команду с уже наполненной базой - команда предварительно очищает её.
+9. **Profit!** Проект доступен по локальному адресу http://127.0.0.1:9000
 
 ### Технологии
 * Docker
