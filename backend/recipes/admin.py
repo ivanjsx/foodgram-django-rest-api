@@ -45,7 +45,7 @@ def ingredients(obj):
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = (
-        "id", "name", "text", "cooking_time", "author", "image",
+        "id", "name", "cooking_time", "author", "image",
         tags, ingredients, "times_favorited"
     )
     list_filter = ("tags", "author", "name")
