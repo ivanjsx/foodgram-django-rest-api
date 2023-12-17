@@ -2,8 +2,15 @@ version: '3.3'
 
 volumes:
   pg_data_production:
+    name: foodgram_pg_data_production
   media_volume:
+    name: foodgram_media_volume
   static_volume:
+    name: foodgram_static_volume
+
+networks:
+  default:
+    name: foodgram_default
 
 services:
   
