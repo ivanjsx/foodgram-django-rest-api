@@ -18,4 +18,8 @@ class PartialUpdateOnlyMixin(UpdateModelMixin):
 class ListCreateRetrieveMixin(ListModelMixin,
                               CreateModelMixin,
                               RetrieveModelMixin):
+    """
+    Allows GET and POST requests only.
+    """
+
     pass

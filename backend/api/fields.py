@@ -7,6 +7,10 @@ from rest_framework.serializers import CharField, ImageField, ValidationError
 
 
 class Base64ImageField(ImageField):
+    """
+    As an input for de-serialization, only accepts a base64-encoded image,
+    and decodes it into a file suitable for ImageField.
+    """
 
     def to_internal_value(self, data):
 
@@ -20,6 +24,12 @@ class Base64ImageField(ImageField):
 
 
 class StringToNaturalNumberField(CharField):
+    """
+    As an input for de-serialization, only accepts a string
+    which can be successfully interpreted as a natural number.
+    Primarily designed for the validation an type conversion
+    of the query params that the API can potentially handle.
+    """
 
     error_message = "must be a positive integer or 0"
 
@@ -34,6 +44,11 @@ class StringToNaturalNumberField(CharField):
 
 
 class StringToBoolField(CharField):
+    """
+    As an input for de-serialization, only accepts two strings: `0` and `1`.
+    Primarily designed for the validation an type conversion
+    of the query params that the API can potentially handle.
+    """
 
     error_message = "must be either 1 or 0"
 

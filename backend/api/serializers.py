@@ -15,6 +15,19 @@ from .fields import (Base64ImageField, StringToBoolField,
 
 
 class QueryParamsSerializer(Serializer):
+    """
+    A single entry point for the validation and type conversion
+    of all the query params that the API can potentially handle.
+    Typical usage example:
+
+    param_value = request.query_params.get("param_name", None)
+    if param_value:
+        serializer = QueryParamsSerializer(data={"param_name": param_value})
+        serializer.is_valid(raise_exception=True)
+        validated_param_value = serializer.validated_data["param_name"]
+        do_something(validated_param_value)
+
+    """
 
     pk = StringToNaturalNumberField(required=False)
     is_favorited = StringToBoolField(required=False)
@@ -23,6 +36,9 @@ class QueryParamsSerializer(Serializer):
 
 
 class TagSerializer(ModelSerializer):
+    """
+    Serializes and de-serializes Tag model instances.
+    """
 
     class Meta:
         model = Tag
@@ -30,22 +46,21 @@ class TagSerializer(ModelSerializer):
 
 
 class IngredientSerializer(ModelSerializer):
+    """
+    Serializes and de-serializes Ingredient model instances.
+    """
 
     class Meta:
         model = Ingredient
         fields = ("id", "name", "measurement_unit")
 
 
-class MinifiedRecipeSerializer(ModelSerializer):
-
-    image = Base64ImageField()
-
-    class Meta:
-        model = Recipe
-        fields = ("id", "name", "image", "cooking_time")
-
-
 class UserShowSerializer(ModelSerializer):
+    """
+    Serializes User model instances.
+    Only designed for displaying an already-existing model instance
+    within the body of the response which replies to safe-methods request.
+    """
 
     is_subscribed = SerializerMethodField()
 
@@ -62,6 +77,10 @@ class UserShowSerializer(ModelSerializer):
 
 
 class ExtendedUserShowSerializer(UserShowSerializer):
+    """
+    Just a usual UserShowSerializer, with 2 additional fields introduced:
+    `recipes` and `recipes_count`.
+    """
 
     recipes = SerializerMethodField()
 
@@ -84,6 +103,12 @@ class ExtendedUserShowSerializer(UserShowSerializer):
 
 
 class UserCreateSerializer(ModelSerializer):
+    """
+    De-serializes User model instances.
+    Only designed for converting the data provided in unsafe-methods request
+    to internal database value, and displaying back the newly created object
+    within the response body.
+    """
 
     class Meta:
         model = User
@@ -98,6 +123,10 @@ class UserCreateSerializer(ModelSerializer):
 
 
 class ChangePasswordSerializer(Serializer):
+    """
+    De-serializes data provided within the body
+    of a request to change user's password.
+    """
 
     current_password = CharField(required=True)
     new_password = CharField(required=True)
@@ -125,6 +154,10 @@ class ChangePasswordSerializer(Serializer):
 
 
 class AmountInputSerializer(Serializer):
+    """
+    De-serializes data provided within the `ingredients` list field
+    upon creating or modifying a Recipe model instance.
+    """
 
     id = IntegerField()
     amount = IntegerField(write_only=True, min_value=1)
@@ -136,6 +169,9 @@ class AmountInputSerializer(Serializer):
 
 
 class AmountOutputSerializer(ModelSerializer):
+    """
+    Serializes `ingredients` list on an already-existing Recipe instance.
+    """
 
     id = IntegerField(source="ingredient.id")
     name = CharField(source="ingredient.name")
@@ -147,6 +183,9 @@ class AmountOutputSerializer(ModelSerializer):
 
 
 class DefaultRecipeSerializer(ModelSerializer):
+    """
+    Serializes and de-serializes Recipe model instances.
+    """
 
     author = UserShowSerializer(required=False)
     image = Base64ImageField()
@@ -231,3 +270,17 @@ class DefaultRecipeSerializer(ModelSerializer):
                                                         ingredient=ingredient,
                                                         amount=data["amount"])
         return instance
+
+
+class MinifiedRecipeSerializer(ModelSerializer):
+    """
+    Serializes Recipe model instances with reduceed amount of fields.
+    Only designed for displaying an already-existing model instance
+    within the body of the response which replies to safe-methods request.
+    """
+
+    image = Base64ImageField()
+
+    class Meta:
+        model = Recipe
+        fields = ("id", "name", "image", "cooking_time")

@@ -37,6 +37,11 @@ class FilterRecipesByTagsAndAuthor(FilterSet):
 
 
 def filter_recipes_by_query_params(queryset, user, params):
+    """
+    Additional filter implementation for Recipe model viewset,
+    which introduces filtering by non-field query params,
+    `is_favorited` and `is_in_shopping_cart`.
+    """
 
     def subquery(list_model, user):
         if user.is_authenticated:
