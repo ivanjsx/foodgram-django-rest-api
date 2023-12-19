@@ -3,17 +3,15 @@ import os
 from typing import Type
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Model
 
+from users.models import CustomUser as User
 from users.models import Subscription
 
 from ...models import Ingredient, Recipe, Tag
-
-User = get_user_model()
 
 DATA_DIRECTORY = "data"
 

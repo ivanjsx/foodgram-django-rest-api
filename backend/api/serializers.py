@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model, password_validation
+from django.contrib.auth import password_validation
 from django.shortcuts import get_object_or_404
 
 from rest_framework.serializers import (CharField, IntegerField,
@@ -8,11 +8,10 @@ from rest_framework.serializers import (CharField, IntegerField,
 
 from recipes.models import (Ingredient, IngredientAmountInRecipe, Recipe,
                             RecipeTag, Tag)
+from users.models import CustomUser as User
 
 from .fields import (Base64ImageField, StringToBoolField,
                      StringToNaturalNumberField)
-
-User = get_user_model()
 
 
 class QueryParamsSerializer(Serializer):

@@ -1,6 +1,5 @@
 from http import HTTPMethod
 
-from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
 
@@ -11,6 +10,7 @@ from rest_framework.status import HTTP_200_OK
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
 from recipes.models import CartItem, FavoriteItem, Ingredient, Recipe, Tag
+from users.models import CustomUser as User
 
 from .filters import (FilterIngredientsByName, FilterRecipesByTagsAndAuthor,
                       filter_recipes_by_query_params)
@@ -27,8 +27,6 @@ from .serializers import (DefaultRecipeSerializer, ExtendedUserShowSerializer,
                           IngredientSerializer, QueryParamsSerializer,
                           TagSerializer, UserCreateSerializer,
                           UserShowSerializer)
-
-User = get_user_model()
 
 
 class TagViewSet(ModelViewSet):

@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db.models import (CASCADE, CharField, ForeignKey, ImageField,
                               IntegerField, ManyToManyField, Model,
@@ -6,11 +5,10 @@ from django.db.models import (CASCADE, CharField, ForeignKey, ImageField,
                               UniqueConstraint)
 
 from core.models import WithTimestamps
+from users.models import CustomUser as User
 
 from .constants import MAX_FIELD_LENGTH
 from .validators import hex_color_validator
-
-User = get_user_model()
 
 
 class WithName(Model):
