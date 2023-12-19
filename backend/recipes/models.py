@@ -7,7 +7,7 @@ from django.db.models import (CASCADE, CharField, ForeignKey, ImageField,
 
 from core.models import WithTimestamps
 
-from .constants import MAX_NAME_LENGTH, MAX_SLUG_LENGTH, MAX_UNIT_LENGTH
+from .constants import MAX_FIELD_LENGTH
 from .validators import hex_color_validator
 
 User = get_user_model()
@@ -20,7 +20,7 @@ class WithName(Model):
     """
 
     name = CharField(
-        max_length=MAX_NAME_LENGTH,
+        max_length=MAX_FIELD_LENGTH,
         verbose_name="name",
         help_text="Provide a name",
     )
@@ -41,7 +41,7 @@ class Tag(WithTimestamps, WithName):
 
     slug = SlugField(
         unique=True,
-        max_length=MAX_SLUG_LENGTH,
+        max_length=MAX_FIELD_LENGTH,
         verbose_name="slug",
         help_text="Provide a unique slug (will be used in the URL address)",
     )
@@ -69,7 +69,7 @@ class Ingredient(WithTimestamps, WithName):
     """
 
     measurement_unit = CharField(
-        max_length=MAX_UNIT_LENGTH,
+        max_length=MAX_FIELD_LENGTH,
         verbose_name="measurement unit",
         help_text="Provide a measurement unit",
     )
