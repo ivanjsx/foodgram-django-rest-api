@@ -22,7 +22,7 @@ class UserViewSetPermission(AllowAny):
     Safe methods are allowed to all users, including anonymous.
     Neither authentication is required to create a user.
     Once created, for further unsafe operations on a user,
-    authentication as the django administrator is required.
+    authentication as the project administrator is required.
     """
 
     def has_object_permission(self, request, view, obj):
@@ -30,7 +30,7 @@ class UserViewSetPermission(AllowAny):
             request.method in SAFE_METHODS
             or request.user
             and request.user.is_authenticated
-            and request.user.is_staff
+            and request.user.is_admin
         )
 
 
@@ -38,18 +38,18 @@ class SetOnesPasswordActionPermission(BasePermission):
     """
     Safe methods are disabled at the action level.
     To change any user's password,
-    authentication as the django administrator is required.
+    authentication as the project administrator is required.
     """
 
     def has_permission(self, request, view):
-        return request.user and request.user.is_staff
+        return request.user and request.user.is_admin
 
 
 class IsAdminOrReadOnly(BasePermission):
     """
     Safe methods are allowed to all users, including anonymous.
     To perform any unsafe operations,
-    authentication as the django administrator is required.
+    authentication as the project administrator is required.
     """
 
     def has_permission(self, request, view):
@@ -57,5 +57,5 @@ class IsAdminOrReadOnly(BasePermission):
             request.method in SAFE_METHODS
             or request.user
             and request.user.is_authenticated
-            and request.user.is_staff
+            and request.user.is_admin
         )

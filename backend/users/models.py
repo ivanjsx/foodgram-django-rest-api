@@ -5,7 +5,8 @@ from django.db.models import (CASCADE, CharField, CheckConstraint, EmailField,
 
 from core.models import WithTimestamps
 
-from .constants import MAX_NAME_LENGTH
+from .constants import (ADMIN_USER_ROLE, DEFAULT_USER_ROLE, MAX_FIELD_LENGTH,
+                        USER_ROLE_CHOICES)
 from .validators import reserved_username_validator
 
 
@@ -15,13 +16,18 @@ class CustomUser(AbstractUser):
     blank fields, validate against reserved usernames and define properties.
     """
 
+    role = CharField(
+        choices=USER_ROLE_CHOICES,
+        default=DEFAULT_USER_ROLE,
+        max_length=5,
+    )
     first_name = CharField(
         verbose_name="first name",
-        max_length=MAX_NAME_LENGTH,
+        max_length=MAX_FIELD_LENGTH,
     )
     last_name = CharField(
         verbose_name="last name",
-        max_length=MAX_NAME_LENGTH
+        max_length=MAX_FIELD_LENGTH
     )
     email = EmailField(
         verbose_name="email address",
@@ -30,7 +36,7 @@ class CustomUser(AbstractUser):
     username = CharField(
         verbose_name="username",
         unique=True,
-        max_length=MAX_NAME_LENGTH,
+        max_length=MAX_FIELD_LENGTH,
         validators=(UnicodeUsernameValidator(), reserved_username_validator),
         error_messages={"unique": "user with this username already exists."},
     )
@@ -41,6 +47,10 @@ class CustomUser(AbstractUser):
     @property
     def recipes_count(self):
         return self.recipes.count()
+
+    @property
+    def is_admin(self):
+        return self.role == ADMIN_USER_ROLE
 
     def __str__(self):
         return self.username
