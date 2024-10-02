@@ -1,26 +1,26 @@
-version: '3.3'
+name: foodgram
 
 volumes:
-  pg_data:
-    name: foodgram_pg_data
-  media_volume:
-    name: foodgram_media_volume
-  static_volume:
-    name: foodgram_static_volume
+  pg-data:
+    name: foodgram-pg-data
+  media-volume:
+    name: foodgram-media-volume
+  static-volume:
+    name: foodgram-static-volume
 
 networks:
   default:
-    name: foodgram_default
+    name: foodgram-default
 
 services:
   
   db:
     container_name: foodgram-db
-    image: postgres:13.10
+    image: postgres:16-alpine
     restart: always
     env_file: ../.env
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - pg-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       timeout: 60s
@@ -33,19 +33,19 @@ services:
     restart: always
     env_file: ../.env
     volumes:
-      - media_volume:/media
-      - static_volume:/backend_static
+      - media-volume:/media
+      - static-volume:/backend_static
     depends_on:
       db:
         condition: service_healthy
   
   frontend:
     container_name: foodgram-frontend
-    build: ../frontend/
+    build: ../frontend
     restart: on-failure
     command: cp -r /app/build/. /frontend_static
     volumes:
-      - static_volume:/frontend_static
+      - static-volume:/frontend_static
   
   gateway:
     container_name: foodgram-gateway
@@ -54,7 +54,7 @@ services:
     ports:
       - 9000:80
     volumes:
-      - media_volume:/media
-      - static_volume:/static
+      - media-volume:/media
+      - static-volume:/static
     depends_on:
       - backend      
