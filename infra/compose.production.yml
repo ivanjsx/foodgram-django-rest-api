@@ -58,9 +58,9 @@ services:
       - name: web
         host_ip: 127.0.0.1
         published: "3007"
-        target: 80      
+        target: 80
     volumes:
       - media_volume:/media
       - static_volume:/static
     depends_on:
-      - backend      
+      - backend

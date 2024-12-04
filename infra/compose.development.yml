@@ -31,7 +31,7 @@ services:
     build:
       context: ../backend
       dockerfile: Dockerfile
-      platforms: 
+      platforms:
         - "linux/amd64"
     pull_policy: build
     image: ivanjsx/foodgram-backend:latest
@@ -50,7 +50,7 @@ services:
     build:
       context: ../frontend
       dockerfile: Dockerfile
-      platforms: 
+      platforms:
         - "linux/amd64"
     pull_policy: build
     image: ivanjsx/foodgram-frontend:latest
@@ -65,9 +65,9 @@ services:
     build:
       context: ../gateway
       dockerfile: Dockerfile
-      platforms: 
+      platforms:
         - "linux/amd64"
-    pull_policy: build  
+    pull_policy: build
     image: ivanjsx/foodgram-gateway:latest
     container_name: foodgram-gateway
     platform: "linux/amd64"
@@ -76,9 +76,9 @@ services:
       - name: web
         host_ip: 127.0.0.1
         published: "3007"
-        target: 80      
+        target: 80
     volumes:
       - media_volume:/media
       - static_volume:/static
     depends_on:
-      - backend      
+      - backend
