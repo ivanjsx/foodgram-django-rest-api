@@ -1,12 +1,12 @@
 name: foodgram
 
 volumes:
-  pg-data:
-    name: foodgram-pg-data
-  media-volume:
-    name: foodgram-media-volume
-  static-volume:
-    name: foodgram-static-volume
+  pg_data:
+    name: foodgram-pg-data-production
+  media_volume:
+    name: foodgram-media
+  static_volume:
+    name: foodgram-static
 
 networks:
   default:
@@ -15,12 +15,12 @@ networks:
 services:
   
   db:
-    container_name: foodgram-db
     image: postgres:16-alpine
+    container_name: foodgram-db
     restart: always
     env_file: ../.env
     volumes:
-      - pg-data:/var/lib/postgresql/data
+      - pg_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       timeout: 60s
@@ -28,33 +28,39 @@ services:
       retries: 12
   
   backend:
+    image: ivanjsx/foodgram-backend:latest
     container_name: foodgram-backend
-    build: ../backend
+    platform: "linux/amd64"
     restart: always
     env_file: ../.env
     volumes:
-      - media-volume:/media
-      - static-volume:/backend_static
+      - media_volume:/media
+      - static_volume:/backend_static
     depends_on:
       db:
         condition: service_healthy
   
   frontend:
+    image: ivanjsx/foodgram-frontend:latest
     container_name: foodgram-frontend
-    build: ../frontend
+    platform: "linux/amd64"
     restart: on-failure
     command: cp -r /app/build/. /frontend_static
     volumes:
-      - static-volume:/frontend_static
+      - static_volume:/frontend_static
   
   gateway:
+    image: ivanjsx/foodgram-gateway:latest
     container_name: foodgram-gateway
-    build: ../gateway
+    platform: "linux/amd64"
     restart: always
     ports:
-      - 9000:80
+      - name: web
+        host_ip: 127.0.0.1
+        published: "3007"
+        target: 80      
     volumes:
-      - media-volume:/media
-      - static-volume:/static
+      - media_volume:/media
+      - static_volume:/static
     depends_on:
       - backend      
